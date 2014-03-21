@@ -1,0 +1,163 @@
+<?php
+/**
+ * @file Simple machine name field.
+ */
+
+/**
+ * Implements hook_field_info().
+ */
+function simple_machine_name_field_field_info() {
+  $return = array();
+
+  $return['simple_machine_name_field'] = array(
+    'label' => t('Simple machine name field'),
+    'description' => t('This field stores the machine name version of a .'),
+    'default_widget' => 'simple_machine_name_field_text',
+    'default_formatter' => 'simple_machine_name_field_text_formatter',
+    'settings' => array('origin_field' => ''),
+  );
+
+  return $return;
+}
+
+function simple_machine_name_field_field_settings_form($field, $instance, $has_data) {
+  $info = entity_get_property_info('taxonomy_term');
+  if (isset($info['properties'])) {
+    $options = array();
+    foreach ($info['properties'] as $name => $property) {
+      $options[$name] = $property['label'];
+    }
+  }
+  $settings = $field['settings'];
+  $form['origin_field'] = array(
+    '#type' => 'select',
+    '#title' => t('Origin field'),
+    '#default_value' => $settings['origin_field'],
+    '#required' => TRUE,
+    '#options' => $options,
+    '#description' => t('Field we\'ll be copying from.'),
+  );
+  return $form;
+}
+
+/**
+ * Implements hook_field_validate().
+ */
+function simple_machine_name_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+
+}
+
+
+
+/**
+ * Implements hook_field_presave().
+ * We'll copy from the origin field to our field.
+ */
+function simple_machine_name_field_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  // we got no form for this, so we have to simulate we got values.
+  $items[0] = array();
+  $settings = $field['settings'];
+  // field we're copying from.
+  $origin_field = $settings['origin_field'];
+  foreach ($items as $delta => $item) {
+    $human_readable = $entity->{$origin_field};
+    // turn this value into a machine name.
+    $machine_readable = _smnf_human_to_machine_name($human_readable);
+    $items[$delta]['value'] = $machine_readable;
+  }
+}
+
+/**
+ * Turns a human readable name into a machine readable name.
+ * @param $human_readable
+ * @return string machine readable name.
+ */
+function _smnf_human_to_machine_name($human_readable){
+  // lowercase
+  $machine_readable = strtolower($human_readable);
+  // turn every non-alphanumeric char into an underscore.
+  $machine_readable = preg_replace('@[^a-z0-9_]+@', '_', $machine_readable);
+  return $machine_readable;
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function simple_machine_name_field_field_formatter_info() {
+  $return = array();
+
+  $return['simple_machine_name_field_text_formatter'] = array(
+    'label' => t('Simple machine name field'),
+    'field types' => array('simple_machine_name_field'),
+  );
+
+  return $return;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function simple_machine_name_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, &$items, $display) {
+  $settings = $display['settings'];
+
+  $element = array();
+  switch ($display['type']) {
+    case 'simple_machine_name_field_text_formatter':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          '#type' => 'html_tag',
+          '#tag' => 'div',
+          '#value' => $item['value'],
+        );
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function simple_machine_name_field_field_widget_info() {
+  return array(
+    'simple_machine_name_field_text' => array(
+      'label' => t('Simple machine name'),
+      'field types' => array('simple_machine_name_field'),
+    ),
+  );
+}
+
+
+
+/**
+ * Implements hook_field_widget_form().
+ * This field is formless.
+ */
+function simple_machine_name_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+//  $value = isset($items[$delta]['value']) ? $items[$delta]['value'] : '';
+//
+//  $widget = $element;
+//  $widget['#delta'] = $delta;
+//
+//  switch ($instance['widget']['type']) {
+//    case 'simple_machine_name_field_text':
+//      $widget += array(
+//        '#type' => 'textfield',
+//        '#default_value' => $value,
+//      );
+//
+//      $element['value'] = $widget;
+//      return $element;
+//
+//      break;
+//  }
+}
+
+
+/**
+ * Implements hook_field_is_empty()
+ */
+function simple_machine_name_field_field_is_empty($item, $field) {
+  return FALSE;
+}

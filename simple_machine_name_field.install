@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for instagram_hashtag.
+ */
+
+/**
+ * Implements hook_schema_field().
+ */
+function simple_machine_name_field_field_schema($field) {
+  switch ($field['type']) {
+    case 'simple_machine_name_field':
+      $columns = array(
+        'value' => array(
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => FALSE
+        ),
+      );
+      $indexes = array(
+        'value' => array('value'),
+      );
+      return array(
+        'columns' => $columns,
+        'indexes' => $indexes,
+      );
+  }
+}
