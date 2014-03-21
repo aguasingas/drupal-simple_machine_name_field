@@ -134,25 +134,8 @@ function simple_machine_name_field_field_widget_info() {
  * Implements hook_field_widget_form().
  * This field is formless.
  */
-function simple_machine_name_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-//  $value = isset($items[$delta]['value']) ? $items[$delta]['value'] : '';
-//
-//  $widget = $element;
-//  $widget['#delta'] = $delta;
-//
-//  switch ($instance['widget']['type']) {
-//    case 'simple_machine_name_field_text':
-//      $widget += array(
-//        '#type' => 'textfield',
-//        '#default_value' => $value,
-//      );
-//
-//      $element['value'] = $widget;
-//      return $element;
-//
-//      break;
-//  }
-}
+//function simple_machine_name_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+//}
 
 
 /**
