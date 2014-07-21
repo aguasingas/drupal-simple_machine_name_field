@@ -1,5 +1,3 @@
 name = Simple Machine Name Field
 description = Creates a machine name with info in another text-based field.
 core = 7.x
-
-;files[] = simple_machine_name_field.views.inc

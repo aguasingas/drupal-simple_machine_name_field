@@ -21,9 +21,16 @@ function simple_machine_name_field_field_info() {
 }
 
 function simple_machine_name_field_field_settings_form($field, $instance, $has_data) {
-  $info = entity_get_property_info('taxonomy_term');
+  $info = entity_get_property_info($instance['entity_type']);
+  $options = array();
+  // Let's get fields from bundles if any
+  if (!empty($instance['bundle'])) {
+    foreach ($info['bundles'][$instance['bundle']]['properties'] as $name => $field_info) {
+      $options[$name] = "{$field_info['label']} ({$name})";
+    }
+  }
+  // And properties
   if (isset($info['properties'])) {
-    $options = array();
     foreach ($info['properties'] as $name => $property) {
       $options[$name] = $property['label'];
     }
@@ -42,9 +49,11 @@ function simple_machine_name_field_field_settings_form($field, $instance, $has_d
 
 /**
  * Implements hook_field_validate().
+ *
+ * No validation, since we're just copying from another field/property.
+ * We rely on other's validations. We're young and naive.
  */
 function simple_machine_name_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
-
 }
 
 
@@ -54,7 +63,7 @@ function simple_machine_name_field_field_validate($entity_type, $entity, $field,
  * We'll copy from the origin field to our field.
  */
 function simple_machine_name_field_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  // we got no form for this, so we have to simulate we got values.
+  // we got no form for this, so we need to simulate we got values.
   $items[0] = array();
   $settings = $field['settings'];
   // field we're copying from.
@@ -96,6 +105,9 @@ function simple_machine_name_field_field_formatter_info() {
 
 /**
  * Implements hook_field_formatter_view().
+ *
+ * This field is not intended to be seen,
+ * but it provides simple output, just in case.
  */
 function simple_machine_name_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, &$items, $display) {
   $settings = $display['settings'];
@@ -132,7 +144,7 @@ function simple_machine_name_field_field_widget_info() {
 
 /**
  * Implements hook_field_widget_form().
- * This field is formless.
+ * This field needs no forms.
  */
 //function simple_machine_name_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
 //}
@@ -142,5 +154,6 @@ function simple_machine_name_field_field_widget_info() {
  * Implements hook_field_is_empty()
  */
 function simple_machine_name_field_field_is_empty($item, $field) {
+  // It's never empty! :D
   return FALSE;
 }
